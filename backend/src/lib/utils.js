@@ -13,3 +13,7 @@ export const generateToken = (userId, res) => {
     })
     return token;
 }
+
+export const responseAPI = (res,intVal,messageVal) =>{
+    res.status(intVal).json({message: messageVal})
+}

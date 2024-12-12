@@ -1,4 +1,4 @@
-import { generateToken } from "../lib/utils.js";
+import { generateToken, responseAPI } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
@@ -47,10 +47,53 @@ export const signup = async (req,res) =>{
     }
 }
 
-export const login = (req,res) =>{
-    res.send("login route");
+export const login = async (req,res) =>{
+    const {email,password} = req.body
+    try {
+
+        
+        if(!email || !password){
+            return res.status(400).json({message:"All fields are required"});
+        }
+        
+        const user = await User.findOne({email})
+        
+        if(!user){
+            return res.status(400).json({message:"Invalid credentials"})
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password,user.password)
+
+        if(!isPasswordCorrect){
+            return res.status(400).json({message:"Wrong Password"});
+        }
+
+        generateToken(user._id,res)
+
+        res.status(200).json({
+            _id: user._id,
+            userName:user.userName,
+            email:user.email,
+            profilePic: user.profilePic
+        })
+    }
+    catch (error) {
+        console.log("Error in login controller",error.message);
+        res.status(500).json({message: "Internal Server Error"})
+    }
+}
+export const logout = (req,res) =>{
+    try {
+        res.cookie("jwt","",{maxAge: 0});
+        //utils responsAPI meaning = res().status().json({message: ""})
+
+        responseAPI(res,200,"Logged out Successfully")
+    } catch (error) {
+        console.log("Error in logout",error.message)
+        responseAPI(res,500,"Internal Server Error")
+    }
 }
 
-export const logout = (req,res) =>{
-    res.send("logout route");
+export const update = async (req,res) =>{
+    res.send("update route")
 }
