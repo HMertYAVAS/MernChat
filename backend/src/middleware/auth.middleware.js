@@ -5,8 +5,6 @@ import { print } from "../lib/utils.js";
 export const protectRoute = async (req, res, next) => {
   try {
       const token = req.cookies.jwt;
-      print("test")
-
     if (!token) {
       return res.status(401).json({ message: "Unauthorized - No Token Provided" });
     }

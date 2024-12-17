@@ -1,22 +1,30 @@
-import express from "express"
-import dotenv from "dotenv"
+import express from "express";
+import dotenv from "dotenv";
 import authRoutes from "./routes/auth.route.js";
-import messageRoutes from "./routes/message.route.js"
-import {connectDB } from "./lib/db.js";
+import messageRoutes from "./routes/message.route.js";
+import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
-dotenv.config()
+dotenv.config();
 const app = express();
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 
 app.use(express.json());
 //this is really important. first cookieparser after routes...
 app.use(cookieParser());
-app.use("/api/auth", authRoutes)
-app.use("/api/message", messageRoutes)
+app.use(
+  cors({
+    origin: process.env.FRONTEND_BASE_URL,
+    credentials: true,
+  })
+);
 
-app.listen(PORT,()=>{
-    console.log("server is running on PORT:" + PORT);
-    connectDB();
+app.use("/api/auth", authRoutes);
+app.use("/api/message", messageRoutes);
+
+app.listen(PORT, () => {
+  console.log("server is running on PORT:" + PORT);
+  connectDB();
 });
